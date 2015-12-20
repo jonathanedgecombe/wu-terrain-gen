@@ -21,6 +21,8 @@ public final class ResourceFilter extends Filter {
 		Random rng = new Random(map.getSeed() + 269463 + seed);
 		HashNoise noise = new HashNoise(rng.nextFloat(), rng.nextFloat());
 
+		double scale = type == 6 ? 0.09 : 0.03;
+
 		for (int x = 0; x < map.getSize(); x++) {
 			for (int y = 0; y < map.getSize(); y++) {
 				if (type == 6) {
@@ -41,7 +43,7 @@ public final class ResourceFilter extends Filter {
 					if (surface.getHeight(x, y) < 128) continue;
 				}
 
-				if (Math.pow(noise.noise(x * 0.09, y * 0.09), type == 6 ? 2 : 5) > (type == 6 ? 0.765 : 0.825)) {
+				if (Math.pow(noise.noise(x * scale, y * scale), type == 6 ? 2 : 5) > (type == 6 ? 0.765 : 0.825)) {
 					surface.setType(x, y, type);
 				}
 			}
