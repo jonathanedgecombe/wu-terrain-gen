@@ -4,11 +4,11 @@ import java.util.Random;
 
 import com.wyverngame.terraingenerator.Map;
 import com.wyverngame.terraingenerator.SurfaceMesh;
-import com.wyverngame.terraingenerator.noise.Noise;
+import com.wyverngame.terraingenerator.noise.HashNoise;
 
 public final class NoiseFilter extends Filter {
-	private final static double POW = 0.9;
-	private final static double MUL = 40;
+	private final static double POW = 1.1;
+	private final static double MUL = 50;
 	private final static double RED = 0.5;
 	private final static int ITERATIONS = 5;
 
@@ -17,7 +17,7 @@ public final class NoiseFilter extends Filter {
 		Random rng = new Random(map.getSeed());
 		float a = rng.nextFloat();
 		float b = rng.nextFloat();
-		Noise noise = new Noise(a, b);
+		HashNoise noise = new HashNoise(a, b);
 
 		SurfaceMesh surface = map.getSurface();
 
@@ -28,7 +28,7 @@ public final class NoiseFilter extends Filter {
 		}
 	}
 
-	private double gen(double x, double y, Noise noise, float a, float b) {
+	private double gen(double x, double y, HashNoise noise, float a, float b) {
 		x *= 0.03;
 		y *= 0.03;
 

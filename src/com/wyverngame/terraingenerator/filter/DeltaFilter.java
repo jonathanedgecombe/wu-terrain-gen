@@ -4,7 +4,7 @@ import com.wyverngame.terraingenerator.Map;
 import com.wyverngame.terraingenerator.SurfaceMesh;
 
 public final class DeltaFilter extends Filter {
-	private final static int DELTA = 200;
+	private final static int DELTA = 1950;
 
 	@Override
 	public void apply(Map map) {

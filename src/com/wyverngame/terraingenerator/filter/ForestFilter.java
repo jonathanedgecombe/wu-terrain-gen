@@ -4,7 +4,7 @@ import java.util.Random;
 
 import com.wyverngame.terraingenerator.Map;
 import com.wyverngame.terraingenerator.SurfaceMesh;
-import com.wyverngame.terraingenerator.noise.Noise;
+import com.wyverngame.terraingenerator.noise.HashNoise;
 
 public final class ForestFilter extends Filter {
 	private final static int[] TYPES = new int[] {100, 101, 103, 105, 106, 107, 108, 109, 110, 111, 112, 113};
@@ -14,19 +14,19 @@ public final class ForestFilter extends Filter {
 		SurfaceMesh surface = map.getSurface();
 
 		Random rng = new Random(map.getSeed() + 128943);
-		Noise[] noises = new Noise[TYPES.length];
-		for (int i = 0; i < noises.length; i++) noises[i] = new Noise(rng.nextFloat(), rng.nextFloat());
+		HashNoise[] noises = new HashNoise[TYPES.length];
+		for (int i = 0; i < noises.length; i++) noises[i] = new HashNoise(rng.nextFloat(), rng.nextFloat());
 
-		Noise base = new Noise(rng.nextFloat(), rng.nextFloat());
+		HashNoise base = new HashNoise(rng.nextFloat(), rng.nextFloat());
 
 		for (int x = 0; x < map.getSize(); x++) {
 			for (int y = 0; y < map.getSize(); y++) {
 				if (surface.getType(x, y) != 2) continue;
-				if (rng.nextInt(3) != 0) continue;
+				if (rng.nextInt(3) == 0) continue;
 
 				int type = 0;
 
-				if (Math.pow(base.noise(x * 0.006, y * 0.006), 2.45) < rng.nextFloat() + 0.08f) {
+				if (Math.pow(base.noise(x * 0.006, y * 0.006), 1.9) < rng.nextFloat() + 0.04f) {
 					if (surface.getHeight(x, y) < 48 && rng.nextInt(40) == 0) {
 						type = 104;
 					} else continue;

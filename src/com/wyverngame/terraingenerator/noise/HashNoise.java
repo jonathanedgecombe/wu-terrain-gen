@@ -1,9 +1,9 @@
 package com.wyverngame.terraingenerator.noise;
 
-public final class Noise {
+public final class HashNoise {
 	private final float a, b;
 
-	public Noise(float a, float b) {
+	public HashNoise(float a, float b) {
 		this.a = a;
 		this.b = b;
 	}

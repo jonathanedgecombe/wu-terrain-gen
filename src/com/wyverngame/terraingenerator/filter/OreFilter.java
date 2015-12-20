@@ -5,7 +5,7 @@ import java.util.Random;
 import com.wyverngame.terraingenerator.CaveMesh;
 import com.wyverngame.terraingenerator.Map;
 import com.wyverngame.terraingenerator.ResourceMesh;
-import com.wyverngame.terraingenerator.noise.Noise;
+import com.wyverngame.terraingenerator.noise.HashNoise;
 
 public final class OreFilter extends Filter {
 	private final static int[] TYPES = new int[] {205, 206, 220, 220, 221, 221, 221, 221, 223, 223, 223, 223, 224, 224, 224, 224, 225, 225, 225, 225, 226, 226, 226, 226};
@@ -17,8 +17,8 @@ public final class OreFilter extends Filter {
 
 		Random rng = new Random(map.getSeed() + 1289);
 
-		Noise[] noises = new Noise[TYPES.length];
-		for (int i = 0; i < noises.length; i++) noises[i] = new Noise(rng.nextFloat(), rng.nextFloat());
+		HashNoise[] noises = new HashNoise[TYPES.length];
+		for (int i = 0; i < noises.length; i++) noises[i] = new HashNoise(rng.nextFloat(), rng.nextFloat());
 
 		for (int x = 0; x < map.getSize(); x++) {
 			for (int y = 0; y < map.getSize(); y++) {

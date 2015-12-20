@@ -8,13 +8,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 
 import com.wyverngame.terraingenerator.filter.AverageFilter;
 import com.wyverngame.terraingenerator.filter.BiomeFilter;
 import com.wyverngame.terraingenerator.filter.DeltaFilter;
 import com.wyverngame.terraingenerator.filter.EdgeFilter;
+import com.wyverngame.terraingenerator.filter.FeatureMountainFilter;
 import com.wyverngame.terraingenerator.filter.ForestFilter;
 import com.wyverngame.terraingenerator.filter.GrassDecoratorFilter;
+import com.wyverngame.terraingenerator.filter.OceanFilter;
 import com.wyverngame.terraingenerator.filter.MountainFilter;
 import com.wyverngame.terraingenerator.filter.NoiseFilter;
 import com.wyverngame.terraingenerator.filter.OreFilter;
@@ -27,78 +32,95 @@ import com.wyverngame.terraingenerator.filter.SmoothCoastFilter;
 import com.wyverngame.terraingenerator.filter.TarPitFilter;
 
 public final class Terragen {
-	public static void main(String[] args) throws IOException {
-		int size = 2048;
-		long seed = System.currentTimeMillis();
-
-		for (String arg : args) {
-			String[] parts = arg.split("=", 2);
-			if (parts.length != 2) continue;
-
-			switch (parts[0].toLowerCase()) {
-			case "-size":
-				size = Integer.parseInt(parts[1]);
-				break;
-			case "-seed":
-				seed = Long.parseLong(parts[1]);
-				break;
-			}
-		}
-
-		System.out.println("Generating " + size + "x" + size + " map with seed " + seed);
+	public static void generate(int size, long seed, JLabel label, JProgressBar progress, JButton button, String name) throws IOException {
+		label.setText(" Generating " + size + "x" + size + " map with seed " + seed);
 		Map map = new Map(size, seed);
+		progress.setValue(1);
 
 		new DeltaFilter().apply(map);
-		System.out.println("Generating mountains");
-		new MountainFilter().apply(map);
-		System.out.println("Generating ridged mountains");
-		new RidgeFilter().apply(map);
-		System.out.println("Generating noise");
+		progress.setValue(5);
+		label.setText(" Generating mountains...");
+		new MountainFilter(size >= 4096).apply(map);
+		progress.setValue(22);
+		label.setText(" Generating ridged mountains...");
+		new RidgeFilter(size >= 4096).apply(map);
+		progress.setValue(42);
+		label.setText(" Generating noise...");
 		new NoiseFilter().apply(map);
-		System.out.println("Generating rives and lakes");
-		new RiverFilter().apply(map);
-		System.out.println("Smoothing terrain");
+		progress.setValue(52);
+		label.setText(" Generating oceans...");
+		new OceanFilter(size <= 2048).apply(map);
+		progress.setValue(55);
+		label.setText(" Smoothing terrain...");
 		new AverageFilter().apply(map);
-		System.out.println("Lowering coastlines");
-		new EdgeFilter().apply(map);
-		System.out.println("Smoothing coastlines");
+		progress.setValue(60);
+		label.setText(" Generating rives and lakes...");
+		new RiverFilter().apply(map);
+		progress.setValue(65);
+		if (size >= 4096) {
+			label.setText(" Generating peaks...");
+			new FeatureMountainFilter().apply(map);
+		}
+		progress.setValue(70);
+		label.setText(" Lowering coastlines...");
+		new EdgeFilter(size <= 2048 ? 128 : 256).apply(map);
+		progress.setValue(75);
+		label.setText(" Smoothing coastlines...");
 		new SmoothCoastFilter().apply(map);
-		System.out.println("Generating rock layer");
+		progress.setValue(80);
+		label.setText(" Generating rock layer...");
 		new RockLayerFilter().apply(map);
-		System.out.println("Generating rocks and cliffs");
+		progress.setValue(82);
+		label.setText(" Generating rocks and cliffs...");
 		new RockDecoratorFilter().apply(map);
-		System.out.println("Generating deserts");
+		progress.setValue(84);
+		label.setText(" Generating deserts...");
 		new BiomeFilter(1, 4639).apply(map);
-		System.out.println("Generating tundra");
+		progress.setValue(86);
+		label.setText(" Generating tundra...");
 		new BiomeFilter(19, 3748).apply(map);
-		System.out.println("Generating steppe");
+		progress.setValue(88);
+		label.setText(" Generating steppe...");
 		new BiomeFilter(22, 8178).apply(map);
-		System.out.println("Generating clay");
+		progress.setValue(90);
+		label.setText(" Generating clay...");
 		new ResourceFilter(6, 6578).apply(map);
-		System.out.println("Generating peat");
+		progress.setValue(91);
+		label.setText(" Generating peat...");
 		new ResourceFilter(18, 8739).apply(map);
-		System.out.println("Generating moss");
+		progress.setValue(92);
+		label.setText(" Generating moss...");
 		new ResourceFilter(20, 1043).apply(map);
-		System.out.println("Generating grass and flowers");
+		progress.setValue(93);
+		label.setText(" Generating grass and flowers...");
 		new GrassDecoratorFilter().apply(map);
-		System.out.println("Generating tar pits");
+		progress.setValue(94);
+		label.setText(" Generating tar pits...");
 		new TarPitFilter().apply(map);
-		System.out.println("Generating forests");
+		progress.setValue(95);
+		label.setText(" Generating forests...");
 		new ForestFilter().apply(map);
-		System.out.println("Generating ores");
+		progress.setValue(96);
+		label.setText(" Generating ores...");
 		new OreFilter().apply(map);
+		progress.setValue(97);
 
-		System.out.println("Rendering map");
+		label.setText(" Rendering map...");
 		BufferedImage img = map.getSurface().render();
+		progress.setValue(99);
 
-		Path dir = Paths.get("./map_" + Long.toString(seed));
+		Path dir = Paths.get("./map_" + name);
 		if (!Files.isDirectory(dir)) {
 			Files.createDirectory(dir);
 		}
 
-		System.out.println("Saving");
+		progress.setValue(100);
+		label.setText(" Saving...");
 		ImageIO.write(img, "PNG", new BufferedOutputStream(Files.newOutputStream(dir.resolve("render.png")), 65536));
 		map.save(dir);
-		System.out.println("Done");
+
+		label.setText(" Done. Saved to map_" + name + ".");
+		button.setEnabled(true);
+		progress.setValue(0);
 	}
 }

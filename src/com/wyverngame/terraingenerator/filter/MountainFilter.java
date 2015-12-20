@@ -4,12 +4,17 @@ import java.util.Random;
 
 import com.wyverngame.terraingenerator.Map;
 import com.wyverngame.terraingenerator.SurfaceMesh;
-import com.wyverngame.terraingenerator.noise.Noise;
+import com.wyverngame.terraingenerator.noise.HashNoise;
 
 public final class MountainFilter extends Filter {
 	private final static float POWER = 8;
-	private final static float HEIGHT = 50;
-	private final static float SCALE = 1;
+	private final float height;
+	private final float scale;
+
+	public MountainFilter(boolean large) {
+		height = large ? 52 : 48;
+		scale = large ? 1.05f : 1;
+	}
 
 	@Override
 	public void apply(Map map) {
@@ -19,17 +24,17 @@ public final class MountainFilter extends Filter {
 		for (int pass = 0; pass < 3; pass++) {
 			float a = rng.nextFloat();
 			float b = rng.nextFloat();
-			Noise noise = new Noise(a, b);
+			HashNoise noise = new HashNoise(a, b);
 
 			for (int x = 0; x < map.getSize(); x++) {
 				for (int y = 0; y < map.getSize(); y++) {
-					surface.addHeight(x, y, (int) gen(x, y, noise, a, b, SCALE / ((float) pass + 1), POWER / ((float) pass + 1), HEIGHT / ((float) pass + 1)));
+					surface.addHeight(x, y, (int) gen(x, y, noise, a, b, scale / ((float) pass + 1), POWER / ((float) pass + 1), height / ((float) pass + 1)));
 				}
 			}
 		}
 	}
 
-	private double gen(double x, double y, Noise noise, float a, float b, float scale, float power, float height) {
+	private double gen(double x, double y, HashNoise noise, float a, float b, float scale, float power, float height) {
 		x *= 0.03 / scale;
 		y *= 0.03 / scale;
 
