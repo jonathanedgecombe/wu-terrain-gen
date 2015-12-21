@@ -3,6 +3,7 @@ package com.wyverngame.terraingenerator;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,7 +117,9 @@ public final class Terragen {
 
 		progress.setValue(100);
 		label.setText(" Saving...");
-		ImageIO.write(img, "PNG", new BufferedOutputStream(Files.newOutputStream(dir.resolve("render.png")), 65536));
+		try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(dir.resolve("render.png")), 65536)) {
+			ImageIO.write(img, "PNG", out);
+		}
 		map.save(dir);
 
 		label.setText(" Done. Saved to map_" + name + ".");
